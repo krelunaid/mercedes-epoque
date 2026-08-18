@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+
+@theme {
+  --color-bg: #0b0b0b;
+  --color-surface: #141414;
+  --color-elevated: #1c1c1c;
+  --color-cream: #f3ebda;
+  --color-muted: #8e8778;
+  --color-gold: #c9a84c;
+  --color-gold-deep: #8f7328;
+  --color-line: #2c281e;
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", serif;
+  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --shadow-card:
+    0 0 0 1px rgba(201, 168, 76, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.55),
+    0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-gold: 0 0 0 1px rgba(201, 168, 76, 0.45), 0 8px 20px rgba(201, 168, 76, 0.12);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html,
+  body,
+  #app {
+    min-height: 100%;
+    background: var(--color-bg);
+    color: var(--color-cream);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    line-height: 1.5;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  img {
+    outline: 1px solid rgba(201, 168, 76, 0.12);
+    outline-offset: -1px;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-gold) 35%, transparent);
+    color: var(--color-cream);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
