@@ -4,21 +4,25 @@ import { CarCard } from "@/components/car-card";
 import { Shell } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 import { CARS } from "@/lib/cars";
-import { EVENTS } from "@/lib/events";
 import { useGarage } from "@/lib/booking-store";
 import { saveEventRsvp } from "@/lib/server/garage";
+import { loadOfficialEvents } from "@/lib/server/events";
 import { useCurrentUser } from "@/lib/auth/use-current-user";
 
 const PINNED = CARS.filter((c) =>
   ["mercedes-300-sl", "mercedes-280-sl", "mercedes-190-sl", "mercedes-amg-gt"].includes(c.slug),
 );
 
-export const Route = createFileRoute("/explore")({ component: Explore });
+export const Route = createFileRoute("/explore")({
+  loader: () => loadOfficialEvents(),
+  component: Explore,
+});
 
 function Explore() {
   const nearby = CARS.filter((c) => c.pickup.city === "Parigi");
-  const featured = EVENTS[0];
-  const attending = useGarage((s) => s.attending.includes(featured.slug));
+  const { events } = Route.useLoaderData();
+  const featured = events[0];
+  const attending = useGarage((s) => s.attending.includes(featured?.slug ?? ""));
   const join = useGarage((s) => s.joinEvent);
   const user = useCurrentUser();
 
@@ -64,29 +68,33 @@ function Explore() {
             Vedi tutti
           </Link>
         </div>
-        <article className="mt-3 overflow-hidden rounded-2xl bg-elevated shadow-[var(--shadow-card)]">
-          <img src={featured.image} alt="" className="aspect-[16/8] w-full object-cover" />
-          <div className="space-y-2 p-4">
-            <h3 className="font-display text-2xl leading-tight">{featured.title}</h3>
-            <p className="text-sm text-gold">{featured.dateLabel}</p>
-            <p className="flex items-center gap-1 text-sm text-muted">
-              <MapPin className="size-3.5" />
-              {featured.place}, {featured.city}
-            </p>
-            <p className="text-sm text-cream/80">{featured.blurb}</p>
-            <Button
-              className="mt-2"
-              variant={attending ? "outline" : "gold"}
-              onClick={() => {
-                join(featured.slug);
-                if (user) void saveEventRsvp({ data: { slug: featured.slug } }).catch(() => {});
-                window.open(featured.url, "_blank", "noopener,noreferrer");
-              }}
-            >
-              {attending ? "Sito ufficiale" : "Info e biglietti"}
-            </Button>
-          </div>
-        </article>
+        {featured ? (
+          <article className="mt-3 overflow-hidden rounded-2xl bg-elevated shadow-[var(--shadow-card)]">
+            <img src={featured.image} alt="" className="aspect-[16/8] w-full object-cover" />
+            <div className="space-y-2 p-4">
+              <h3 className="font-display text-2xl leading-tight">{featured.title}</h3>
+              <p className="text-sm text-gold">{featured.dateLabel}</p>
+              <p className="flex items-center gap-1 text-sm text-muted">
+                <MapPin className="size-3.5" />
+                {featured.place}, {featured.city}
+              </p>
+              <p className="text-sm text-cream/80">{featured.blurb}</p>
+              <Button
+                className="mt-2"
+                variant={attending ? "outline" : "gold"}
+                onClick={() => {
+                  join(featured.slug);
+                  if (user) void saveEventRsvp({ data: { slug: featured.slug } }).catch(() => {});
+                  window.open(featured.url, "_blank", "noopener,noreferrer");
+                }}
+              >
+                {attending ? "Sito ufficiale" : "Info e biglietti"}
+              </Button>
+            </div>
+          </article>
+        ) : (
+          <p className="mt-4 text-sm text-muted">Nessun evento aperto. Il calendario si aggiorna da solo.</p>
+        )}
       </section>
 
       <section className="mt-8">
